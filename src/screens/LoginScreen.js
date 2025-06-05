@@ -1,27 +1,35 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  Button,
-  TouchableOpacity,
-} from "react-native";
-import React from "react";
-import { useState } from "react";
-import { AntDesign, EntryDesign, Ionicons } from "@expo/vector-icons";
+import { View, Text, StyleSheet, TextInput, Button, TouchableOpacity, Alert } from 'react-native'
+import React, { useContext } from 'react'
+import { useState } from 'react'
+import { AntDesign, Ionicons } from '@expo/vector-icons'
+import { signInWithEmailAndPassword } from 'firebase/auth'
+import { auth } from '../config/firebaseConfig'
+import { AuthContext } from '../context/AuthContext'
 
 const LoginScreen = ({ navigation }) => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const { user } = useContext(AuthContext)
 
+  const handleLogin = async () => {
+      try {
+        console.log("autenticando...")
+        await signInWithEmailAndPassword(auth, email, password)
+        console.log("autenticado!")
+        navigation.replace('Main')
+      } catch (error) {
+        Alert.alert('Erro', 'Email ou senha inválido')
+      }
+    }
+    
   return (
     <View style={styles.container}>
       <Text style={styles.title}>🔐 Login</Text>
       <TextInput
-        placeholder="Digite seu nome"
+        placeholder="Digite seu e-mail"
         style={styles.input}
-        value={username}
-        onChangeText={setUsername}
+        value={email}
+        onChangeText={setEmail}
       />
 
       <TextInput
@@ -32,7 +40,10 @@ const LoginScreen = ({ navigation }) => {
         onChangeText={setPassword}
       />
 
-      <Button title="Entrar" onPress={() => navigation.replace('Main')}/>
+      <Button title="Entrar" onPress={handleLogin}/>
+
+      <Text style={styles.orText}>Ainda não tem conta?</Text>
+      <Button title="Cadastra-se" onPress={() => navigation.navigate('Register')}/>
 
       <Text style={styles.orText}>Ou entre com</Text>
 
